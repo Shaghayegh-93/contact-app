@@ -1,17 +1,28 @@
-const ContactList = ({ contactList,onDelete }) => {
+import { Link } from "react-router-dom";
+import "./contactList.css";
+import Contact from "./Contact/Contact";
+
+const ContactList = ({ contactList, onDelete }) => {
   return (
-    <>
-      {contactList.map((contact) => {
-          const{name,email,id}=contact
-        return (
-          <div key={id}>
-            <p>name:{name}</p>
-            <p>email:{email}</p>
-            <button onClick={()=>onDelete(id)}>Delete </button>
-          </div>
-        );
-      })}
-    </>
+    <section className="listWrapper">
+      <div className="contactList">
+        <div className="listHeader">
+          <h2>contacts</h2>
+          <Link to="/add">
+            <button>Add</button>
+          </Link>
+        </div>
+        {contactList.map((contact) => {
+          return (
+            <Contact
+              key={contact.id}
+              contact={contact}
+              onDelete={() => onDelete(contact.id)}
+            />
+          );
+        })}
+      </div>
+    </section>
   );
 };
 
