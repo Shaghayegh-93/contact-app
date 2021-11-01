@@ -4,6 +4,9 @@ import AddContact from "./components/AddContact/AddContact";
 import ContactList from "./components/contactList/ContactList";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+// import routes from "./routes";
+import { Route, Switch } from "react-router-dom";
+import ContactDetail from "./components/ContactDetail/ContactDetail";
 
 function App() {
   const [contactList, setContactList] = useState([]);
@@ -35,9 +38,31 @@ function App() {
     <main className="App">
       <h1>Contact App</h1>
       <ToastContainer />
-      <AddContact addContactHandler={addContactHandler} />
+      {/* <AddContact addContactHandler={addContactHandler} /> */}
 
-      <ContactList contactList={contactList} onDelete={deleteContactHandler} />
+      {/* <ContactList contactList={contactList} onDelete={deleteContactHandler} /> */}
+      <Switch>
+        <Route path="/user/:id" component={ContactDetail} />
+        <Route
+          path="/"
+          exact
+          render={() => (
+            <ContactList
+              contactList={contactList}
+              onDelete={deleteContactHandler}
+            />
+          )}
+        />
+        <Route
+          path="/add"
+          render={(props) => (
+            <AddContact addContactHandler={addContactHandler} {...props} />
+          )}
+        />
+        {/* {routes.map((route, index) => (
+          <Route {...route} key={index} />
+        ))} */}
+      </Switch>
     </main>
   );
 }
