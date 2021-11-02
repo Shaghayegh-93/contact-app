@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./contactList.css";
 import Contact from "./Contact/Contact";
 import getContacts from "../../services/getContactService";
@@ -7,11 +7,14 @@ import deleteContact from "../../services/deleteContactService";
 
 const ContactList = (props) => {
   const [contactList, setContactList] = useState(null);
+  const [allContactList, setAllContactList] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchContacts = async () => {
       const { data } = await getContacts();
       setContactList(data);
+      setAllContactList(data);
     };
     try {
       fetchContacts();
@@ -24,8 +27,25 @@ const ContactList = (props) => {
         (contact) => contact.id !== id
       );
       setContactList(filteredContacts);
+     
     } catch (error) {}
   };
+  const searchHandler = (e) => {
+    setSearchTerm(e.target.value);
+    const search=e.target.value;
+   if(search !== ""){
+    const filteredContactsList = allContactList.filter((c) => {
+      return Object.values(c)
+        .join("")
+        .toLowerCase()
+        .includes(search.toLowerCase());
+    });
+   setContactList(filteredContactsList);
+   }else{
+     setContactList(allContactList)
+   }
+  };
+
   return (
     <section className="listWrapper">
       <div className="contactList">
@@ -34,6 +54,9 @@ const ContactList = (props) => {
           <Link to="/add">
             <button>Add</button>
           </Link>
+        </div>
+        <div>
+          <input type="text" onChange={searchHandler} value={searchTerm} />
         </div>
         {contactList ? (
           contactList.map((contact) => {
