@@ -7,7 +7,7 @@ const ContactList = ({ contactList, onDelete }) => {
     <section className="listWrapper">
       <div className="contactList">
         <div className="listHeader">
-          <h2>contacts</h2>
+          <h2>Contacts</h2>
           <Link to="/add">
             <button>Add</button>
           </Link>
