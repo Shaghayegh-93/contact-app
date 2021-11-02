@@ -1,17 +1,27 @@
 import { useState } from "react";
-import "./addContact.css"
+import "./addContact.css";
+import addContacts from "../../services/addContactService";
+import { toast } from "react-toastify";
 
-const AddContact = ({addContactHandler,history}) => {
+const AddContact = ({ history }) => {
   const [contact, setContact] = useState({ name: "", email: "" });
   const changeHandler = (e) => {
     setContact({ ...contact, [e.target.name]: e.target.value });
   };
-  const submitHandler=(e)=>{
+
+  const submitHandler = async (e) => {
+    if (!contact.name || !contact.email) {
+      toast.warning("all fildes are mandatory!");
+      return;
+    }
     e.preventDefault();
-    addContactHandler(contact);
-    setContact({ name: "", email: "" })
+    try {
+      await addContacts(contact);
+      setContact({ name: "", email: "" });
+    } catch (error) {}
+
     history.push("/");
-  }
+  };
 
   return (
     <form onSubmit={submitHandler}>
@@ -33,7 +43,7 @@ const AddContact = ({addContactHandler,history}) => {
           onChange={changeHandler}
         ></input>
       </div>
-      <button type="submit" >Add Contact</button>
+      <button type="submit">Add Contact</button>
     </form>
   );
 };
