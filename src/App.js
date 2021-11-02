@@ -7,33 +7,52 @@ import "react-toastify/dist/ReactToastify.css";
 // import routes from "./routes";
 import { Route, Switch } from "react-router-dom";
 import ContactDetail from "./components/ContactDetail/ContactDetail";
+import getContacts from "./services/getContactService";
+import deleteContact from "./services/deleteContactService";
+import addContacts from "./services/addContactService";
+import EditContact from "./components/EditContact/EditContact";
+import updateContact from "./services/updateContact";
 
 function App() {
   const [contactList, setContactList] = useState([]);
-  const addContactHandler = (contact) => {
+  const addContactHandler = async (contact) => {
     if (!contact.name || !contact.email) {
       toast.warning("all fildes are mandatory!");
       return;
     }
-
-    setContactList([
-      ...contactList,
-      { id: Math.ceil(Math.random() * 100), ...contact },
-    ]);
+    try {
+      const { data } = await addContacts(contact);
+      setContactList([...contactList, data]);
+    } catch (error) {}
   };
-  const deleteContactHandler = (id) => {
-    const filteredContacts = contactList.filter((contact) => contact.id !== id);
-    setContactList(filteredContacts);
+  const editContactHandler = async (contact, id) => {
+    try {
+      await updateContact(id, contact);
+      const { data } = await getContacts();
+      setContactList(data);
+    } catch (error) {}
+  };
+  const deleteContactHandler = async (id) => {
+    try {
+      await deleteContact(id);
+      const filteredContacts = contactList.filter(
+        (contact) => contact.id !== id
+      );
+      setContactList(filteredContacts);
+    } catch (error) {}
   };
 
   useEffect(() => {
-    const savedContacts = JSON.parse(localStorage.getItem("contactList"));
-    if (savedContacts) setContactList(savedContacts);
+    
+    const fetchContacts = async () => {
+      const { data } = await getContacts();
+      setContactList(data);
+    };
+    try {
+      fetchContacts();
+    } catch (error) {}
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("contactList", JSON.stringify(contactList));
-  }, [contactList]);
   return (
     <main className="App">
       <h1>Contact App</h1>
@@ -42,6 +61,12 @@ function App() {
 
       {/* <ContactList contactList={contactList} onDelete={deleteContactHandler} /> */}
       <Switch>
+        <Route
+          path="/edit/:id"
+          render={(props) => (
+            <EditContact editContactHandler={editContactHandler} {...props} />
+          )}
+        />
         <Route path="/user/:id" component={ContactDetail} />
         <Route
           path="/"
@@ -59,9 +84,6 @@ function App() {
             <AddContact addContactHandler={addContactHandler} {...props} />
           )}
         />
-        {/* {routes.map((route, index) => (
-          <Route {...route} key={index} />
-        ))} */}
       </Switch>
     </main>
   );
