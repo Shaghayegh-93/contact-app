@@ -1,23 +1,35 @@
 import { useEffect, useState } from "react";
-import getOneContact from "../../services/getOneContact"
+import getOneContact from "../../services/getOneContact";
+import getContacts from "../../services/getContactService";
+import updateContact from "../../services/updateContact";
+import { toast } from "react-toastify";
+
 // import "./addContact.css";
 
-const EditContact = ({ editContactHandler, history,match }) => {
+const EditContact = ({ history, match }) => {
   const [contact, setContact] = useState({ name: "", email: "" });
   const changeHandler = (e) => {
     setContact({ ...contact, [e.target.name]: e.target.value });
   };
-  const submitHandler = (e) => {
+
+  const submitHandler = async (e) => {
+    if (!contact.name || !contact.email) {
+      toast.warning("all fildes are mandatory!");
+      return;
+    }
     e.preventDefault();
-    editContactHandler(contact,match.params.id);
-    setContact({ name: "", email: "" });
-    history.push("/");
+    try {
+      await updateContact(match.params.id, contact);
+      history.push("/");
+    } catch (error) {}
+
   };
+
   useEffect(() => {
     const localFetch = async () => {
       try {
-     const{data} = await getOneContact(match.params.id);
-     setContact({name:data.name,email:data.email})
+        const { data } = await getOneContact(match.params.id);
+        setContact({ name: data.name, email: data.email });
       } catch (error) {}
     };
     localFetch();
